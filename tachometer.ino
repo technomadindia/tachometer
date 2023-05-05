@@ -41,7 +41,7 @@ volatile bool fValidResult = false;
 volatile unsigned int rpmSensorPulses = 0;
 unsigned long lastInterruptTime = 0;
 unsigned long lastReadingTime = 0;
-unsigned int timeBuffer[BUFFER_SIZE];
+unsigned long timeBuffer[BUFFER_SIZE];
 unsigned int pulseBuffer[BUFFER_SIZE];
 int iBuffer = 0;
 unsigned int rpm = 0;
@@ -74,7 +74,7 @@ void loop() {
 }
 
 void countUpdate() {
-  unsigned int currentInterruptTime = millis();
+  unsigned long currentInterruptTime = millis();
   if (currentInterruptTime - lastInterruptTime > 10) // we set a no-interrupts window
   {
     rpmSensorPulses++; //increase count
@@ -85,15 +85,15 @@ void countUpdate() {
 
 unsigned int getRPM()
 {
-  unsigned int currentReadingTime = millis();
+  unsigned long currentReadingTime = millis();
   if (currentReadingTime - lastReadingTime >= 1000)
   {
     pulseBuffer[iBuffer] = rpmSensorPulses;
     timeBuffer[iBuffer] = currentReadingTime;
 
-    unsigned int dTime = timeBuffer[iBuffer] - timeBuffer[(iBuffer + 1) % (BUFFER_SIZE)];
+    unsigned long dTime = timeBuffer[iBuffer] - timeBuffer[(iBuffer + 1) % (BUFFER_SIZE)];
     unsigned int sPulse = pulseBuffer[iBuffer] - pulseBuffer[(iBuffer + 1) % (BUFFER_SIZE)];
-    rpm = sPulse * 30 / ((dTime + 500) / 1000);
+    rpm = sPulse * 30 / (((unsigned int)dTime + 500) / 1000);
 
     if (true == fValidResult) {
       Serial.print(sPulse);
